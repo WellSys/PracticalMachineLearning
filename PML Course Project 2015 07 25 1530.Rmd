@@ -1,5 +1,5 @@
 ---
-title: "Practical Machine Learning Course Project Test 02"
+title: "Practical Machine Learning Course Project Test"
 author: "Doug McCaleb"
 date: "Saturday, July 25, 2015"
 output: html_document
@@ -20,3 +20,15 @@ plot(cars)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# Executive Summary
+
+In this class project for Practical Machine Learning with Jeff Leek, PhD, of Johns Hopkins Bloomberg School of Public Health, we derive the machine knowledge necessary for the machine to be able to interpret data to infer whether six people performed barbell lifts correctly or incorrectly. The manner in which the physical exercises are performed is identified in the _classe_ variable, which reflects the category of each outcome alphanumerically as "A", "B", "C", "D", or "E".
+
+Specifically, the goal of this project is to determine, without reference to the _classe_ variable in the test data, whether the test participants performed the physical exercises correclty or incorrectly.
+
+The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv, and the data for testing the machine's knowledge comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.  These data are provided by http://groupware.les.inf.puc-rio.br/har.
+
+This document summarizes 1) how the machine knowlege ("the model") was built, 2) how we cross-validated it, 3) what the expected out-of-sample error is, and what choices are made. 
+
+
