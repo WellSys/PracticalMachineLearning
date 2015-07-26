@@ -139,7 +139,7 @@ dim(trainingTrainingData)</code></pre>
 <pre><code>## [1] 13737    53</code></pre>
 <pre class="r"><code>dim(testingTrainingData)</code></pre>
 <pre><code>## [1] 5885   53</code></pre>
-<p>This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in a traingTrainingData. We also have 5885 observations of training data, in testTrainingData, that we will use to trest our model before final application on the downloaded test data that is in testingData.</p>
+<p>This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in the trainingTrainingData data set. We also have 5885 observations of training data, in the testTrainingData data set, that we will use to test our model before final application on the downloaded test data that is in the testingData data set.</p>
 <p>Later, we will use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.</p>
 <p>Before we start on the model, let’s check on covariates between trainingTrainingData and testingTrainingData to see if we can further simplify our data by eliminating “zero covariates” that will not help us predict.</p>
 <pre class="r"><code>NetZeroCovariateColumns &lt;- nearZeroVar(trainingTrainingData)
@@ -150,7 +150,7 @@ NetZeroCovariateColumns</code></pre>
 </div>
 <div id="how-the-machine-knowlege-the-model-is-built" class="section level2">
 <h2>How the Machine Knowlege (“The Model”) is Built</h2>
-<p>We will first build the model on the training portion of the training data using the randomForest alghorith and evaluate its accuracy and out-of-sample error.</p>
+<p>We will first build the model on the training portion of the training data using the randomForest alghorith.</p>
 <pre class="r"><code>trainingControl &lt;- trainControl(method = &quot;cv&quot;, 5)
 
 modelFit &lt;- train(classe ~ ., 
@@ -182,7 +182,7 @@ modelFit</code></pre>
 </div>
 <div id="model-evaluation-and-predicting-out-of-sample-error-rate" class="section level2">
 <h2>Model Evaluation and Predicting Out-of-Sample Error Rate</h2>
-<p>We evaluate the model against the testingTrainingData data set first, producing a confusion matrix.</p>
+<p>We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy and out-of-sample error rate.</p>
 <pre class="r"><code>testingTrainingDataPredictions &lt;- predict(modelFit, testingTrainingData)
 
 confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)</code></pre>

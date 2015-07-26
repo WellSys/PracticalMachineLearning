@@ -101,7 +101,7 @@ dim(trainingTrainingData)
 dim(testingTrainingData)
 ```
 
-This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in a traingTrainingData.  We also have 5885 observations of training data, in testTrainingData, that we will use to test our model before final application on the downloaded test data that is in testingData.  
+This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in the trainingTrainingData data set.  We also have 5885 observations of training data, in the testTrainingData data set, that we will use to test our model before final application on the downloaded test data that is in the testingData data set.  
 
 Later, we will use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.
 
@@ -117,7 +117,7 @@ We can see from the fact that NetZeroCovariateColumns is zero that our prior dat
 
 ## How the Machine Knowlege ("The Model") is Built
 
-We will first build the model on the training portion of the training data using the randomForest alghorith and evaluate its accuracy and out-of-sample error.
+We will first build the model on the training portion of the training data using the randomForest alghorith.
 
 
 ```{r BuildModel, echo = TRUE, message=TRUE}
@@ -133,7 +133,7 @@ modelFit
 
 ## Model Evaluation and Predicting Out-of-Sample Error Rate
 
-We evaluate the model against the testingTrainingData data set first, producing a confusion matrix.
+We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy and out-of-sample error rate.
 
 ```{r EvaluateModel, echo = TRUE, message=TRUE}
 testingTrainingDataPredictions <- predict(modelFit, testingTrainingData)
