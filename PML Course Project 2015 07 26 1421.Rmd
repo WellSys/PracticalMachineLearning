@@ -1,11 +1,11 @@
 ---
 title: "Practical Machine Learning Course Project"
 author: "Doug McCaleb"
-date: "Saturday, July 25, 2015"
+date: "Sunday, July 26, 2015"
 output: html_document
 ---
 
-## Executive Summary
+### Executive Summary
 
 In this class project for Practical Machine Learning with Jeff Leek, PhD, of Johns Hopkins Bloomberg School of Public Health, we derive the machine knowledge necessary for the machine to be able to interpret data to infer whether six people performed barbell lifts correctly or incorrectly.  The manner in which the physical exercises are performed is identified in the _classe_ variable, which reflects the category of each outcome alphanumerically as "A", "B", "C", "D", or "E".  
 
@@ -54,7 +54,7 @@ read.csv = function(file, ...) {
 }
 ```
 
-## Getting, Exploring, Cleaning, and Structuring the Data
+### Getting, Exploring, Cleaning, and Structuring the Data
 
 Here we get the data from the sources, setting missing data along the way, and take a look at the structure.
 
@@ -99,7 +99,7 @@ NetZeroCovariateColumns
 
 We can see from the fact that NetZeroCovariateColumns is zero that our prior data cleaning eliminated net zero covariates and that we should have clean predictors. 
 
-## How We Will Cross-Validate
+### How We Will Cross-Validate
 
 We break up the training data for cross-validation purposes -- We divide the training data 70% for buidling the model (training), and 30% for testing the model on the training data before applying the model to downloaded test data.  
 
@@ -115,7 +115,7 @@ This gives us a set of training data for actual training purposes having 13737 o
 
 Later, we will also use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.
 
-## How the Machine Knowlege ("The Model") is Built
+### How the Machine Knowlege ("The Model") is Built
 
 As a randomly chosen starting point, we will first build the model on the training portion of the training data, the trainingTrainingData data set, using the randomForest alghorith with K-fold cross validation across five subsets of data, and see what kind of accuracy we get.
 
@@ -132,7 +132,7 @@ modelFit
 
 This looks promising, as the accuracy of the final model, mtry = 27, is 99.04%.
 
-## Model Evaluation and Predicting Out-of-Sample Error Rate
+### Model Evaluation and Predicting Out-of-Sample Error Rate
 
 We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy and out-of-sample error rate.
 
@@ -144,7 +144,7 @@ confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)
 
 Our test against the testingTrainingData predicts that the accuracy of the model will be 99.17%, with an out-of-sample error rate of .83%.
 
-## Model Application to Test Data
+### Model Application to Test Data
 
 Now we apply our model to the downloaded test data in the testingData data set.
 
@@ -155,7 +155,7 @@ results <- predict(modelFit, testingData)
 results
 ```
 
-## Uploading Results to Coursera
+### Uploading Results to Coursera
 
 ```{r UploadToCoursera, echo = TRUE, message=TRUE}
 workingDirectory <- getwd()
@@ -177,7 +177,7 @@ setwd(workingDirectory)
 
 Our results turn out to be 100% accurate according to the Coursera results scoring page.
 
-## References
+### References
 
 http://groupware.les.inf.puc-rio.br/har#dataset
 

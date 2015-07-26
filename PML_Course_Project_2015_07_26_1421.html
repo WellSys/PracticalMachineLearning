@@ -54,17 +54,18 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="header">
 <h1 class="title">Practical Machine Learning Course Project</h1>
 <h4 class="author"><em>Doug McCaleb</em></h4>
-<h4 class="date"><em>Saturday, July 25, 2015</em></h4>
+<h4 class="date"><em>Sunday, July 26, 2015</em></h4>
 </div>
 
 
-<div id="executive-summary" class="section level2">
-<h2>Executive Summary</h2>
+<div id="executive-summary" class="section level3">
+<h3>Executive Summary</h3>
 <p>In this class project for Practical Machine Learning with Jeff Leek, PhD, of Johns Hopkins Bloomberg School of Public Health, we derive the machine knowledge necessary for the machine to be able to interpret data to infer whether six people performed barbell lifts correctly or incorrectly. The manner in which the physical exercises are performed is identified in the <em>classe</em> variable, which reflects the category of each outcome alphanumerically as “A”, “B”, “C”, “D”, or “E”.</p>
 <p>“Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes.” “Six young [male] health participants [aged between 20 - 28 years] were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).” (See <a href="http://groupware.les.inf.puc-rio.br/har#dataset">http://groupware.les.inf.puc-rio.br/har#dataset</a>)</p>
 <p>Specifically, the goal of this project is to determine, without reference to the <em>classe</em> variable in test data, whether the test participants performed the physical exercises correclty and, if they did not perform the exercises correctly, in what manner they performed the exercises incorrectly.</p>
 <p>The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and the Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a>, and the data for testing the machine’s knowledge comes from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>. These data are provided by <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>.</p>
 <p>This document summarizes 1) how we get the data and prepare it for the exercise, 2) how we will cross-validate the data, 3) how the machine knowlege (“the model”) is built, 4) the validation of the model including its expected accuracy and expected out-of-sample error rate, 5) the application of the model to the final test data, and 6) the parsing of the results for submission to Coursera.</p>
+</div>
 <div id="housekeeping" class="section level3">
 <h3>Housekeeping</h3>
 <pre class="r"><code>library(RCurl)
@@ -76,9 +77,8 @@ library(ggplot2)
 library(lattice)
 set.seed(123)</code></pre>
 </div>
-</div>
-<div id="getting-exploring-cleaning-and-structuring-the-data" class="section level2">
-<h2>Getting, Exploring, Cleaning, and Structuring the Data</h2>
+<div id="getting-exploring-cleaning-and-structuring-the-data" class="section level3">
+<h3>Getting, Exploring, Cleaning, and Structuring the Data</h3>
 <p>Here we get the data from the sources, setting missing data along the way, and take a look at the structure.</p>
 <pre class="r"><code>trainingData &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;, na.strings=c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))
 testingData  &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;,  na.strings=c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))</code></pre>
@@ -135,8 +135,8 @@ NetZeroCovariateColumns</code></pre>
 <pre><code>## integer(0)</code></pre>
 <p>We can see from the fact that NetZeroCovariateColumns is zero that our prior data cleaning eliminated net zero covariates and that we should have clean predictors.</p>
 </div>
-<div id="how-we-will-cross-validate" class="section level2">
-<h2>How We Will Cross-Validate</h2>
+<div id="how-we-will-cross-validate" class="section level3">
+<h3>How We Will Cross-Validate</h3>
 <p>We break up the training data for cross-validation purposes – We divide the training data 70% for buidling the model (training), and 30% for testing the model on the training data before applying the model to downloaded test data.</p>
 <pre class="r"><code>dataForTraining &lt;- createDataPartition(y = trainingData$classe, p = 0.7, list = FALSE)
 trainingTrainingData &lt;- trainingData[dataForTraining,]
@@ -148,8 +148,8 @@ dim(trainingTrainingData)</code></pre>
 <p>This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in the trainingTrainingData data set. We also have 5885 observations of training data, in the testTrainingData data set, that we will use to test our model before using the model on the downloaded test data that is in the testingData data set.</p>
 <p>Later, we will also use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.</p>
 </div>
-<div id="how-the-machine-knowlege-the-model-is-built" class="section level2">
-<h2>How the Machine Knowlege (“The Model”) is Built</h2>
+<div id="how-the-machine-knowlege-the-model-is-built" class="section level3">
+<h3>How the Machine Knowlege (“The Model”) is Built</h3>
 <p>As a randomly chosen starting point, we will first build the model on the training portion of the training data, the trainingTrainingData data set, using the randomForest alghorith with K-fold cross validation across five subsets of data, and see what kind of accuracy we get.</p>
 <pre class="r"><code>trainingControl &lt;- trainControl(method = &quot;cv&quot;, 5)
 
@@ -181,8 +181,8 @@ modelFit</code></pre>
 ## The final value used for the model was mtry = 27.</code></pre>
 <p>This looks promising, as the accuracy of the final model, mtry = 27, is 99.04%.</p>
 </div>
-<div id="model-evaluation-and-predicting-out-of-sample-error-rate" class="section level2">
-<h2>Model Evaluation and Predicting Out-of-Sample Error Rate</h2>
+<div id="model-evaluation-and-predicting-out-of-sample-error-rate" class="section level3">
+<h3>Model Evaluation and Predicting Out-of-Sample Error Rate</h3>
 <p>We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy and out-of-sample error rate.</p>
 <pre class="r"><code>testingTrainingDataPredictions &lt;- predict(modelFit, testingTrainingData)
 
@@ -220,8 +220,8 @@ confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)</cod
 ## Balanced Accuracy      0.9973   0.9935   0.9872   0.9960   0.9992</code></pre>
 <p>Our test against the testingTrainingData predicts that the accuracy of the model will be 99.17%, with an out-of-sample error rate of .83%.</p>
 </div>
-<div id="model-application-to-test-data" class="section level2">
-<h2>Model Application to Test Data</h2>
+<div id="model-application-to-test-data" class="section level3">
+<h3>Model Application to Test Data</h3>
 <p>Now we apply our model to the downloaded test data in the testingData data set.</p>
 <pre class="r"><code>results &lt;- predict(modelFit, testingData)
 
@@ -229,8 +229,8 @@ results</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
 ## Levels: A B C D E</code></pre>
 </div>
-<div id="uploading-results-to-coursera" class="section level2">
-<h2>Uploading Results to Coursera</h2>
+<div id="uploading-results-to-coursera" class="section level3">
+<h3>Uploading Results to Coursera</h3>
 <pre class="r"><code>workingDirectory &lt;- getwd()
 
 setwd(&quot;F:/Prebuild Keep/Training/Coursera/8. Practical Machine Learning/CourseraSubmissionFiles&quot;)
@@ -248,8 +248,8 @@ pml_write_files(results)
 setwd(workingDirectory)</code></pre>
 <p>Our results turn out to be 100% accurate according to the Coursera results scoring page.</p>
 </div>
-<div id="references" class="section level2">
-<h2>References</h2>
+<div id="references" class="section level3">
+<h3>References</h3>
 <p><a href="http://groupware.les.inf.puc-rio.br/har#dataset">http://groupware.les.inf.puc-rio.br/har#dataset</a></p>
 <p>Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013. Read more: <a href="http://groupware.les.inf.puc-rio.br/har#dataset#ixzz3gwqpfrXI">http://groupware.les.inf.puc-rio.br/har#dataset#ixzz3gwqpfrXI</a></p>
 <p><a href="http://stackoverflow.com/questions/28997402/r-read-csv-from-url-error-in-knitr">http://stackoverflow.com/questions/28997402/r-read-csv-from-url-error-in-knitr</a> for code to enable direct read.csv of URL-sourced data from within Knitr execution.</p>
