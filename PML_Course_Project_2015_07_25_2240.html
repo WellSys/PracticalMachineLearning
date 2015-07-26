@@ -64,7 +64,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>“Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes.” “Six young [male] health participants [aged between 20 - 28 years] were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).” (See <a href="http://groupware.les.inf.puc-rio.br/har#dataset">http://groupware.les.inf.puc-rio.br/har#dataset</a>)</p>
 <p>Specifically, the goal of this project is to determine, without reference to the <em>classe</em> variable in test data, whether the test participats performed the physical exercises correclty and, if they did not perform the exercises correctly, in what manner they performed them incorrectly.</p>
 <p>The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a>, and the data for testing the machine’s knowledge comes from <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>. These data are provided by <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>.</p>
-<p>This document summarizes 1) how the machine knowlege (“the model”) was built, 2) how we cross-validated it, 3) what the expected out-of-sample error is, and what choices are made.</p>
+<p>This document summarizes 1) how we get the data and prepare it for the exercise, 2) how we will cross-validate the data, 3) how the machine knowlege (“the model”) is built, 4) the validation of the model including its expected accuracy and expected out-of-sample error rate, 5) the application of the model to the final test data, and 6) the parsing of the results for submission to Coursera.</p>
 <div id="housekeeping" class="section level3">
 <h3>Housekeeping</h3>
 <pre class="r"><code>library(RCurl)
@@ -76,8 +76,9 @@ library(ggplot2)
 library(lattice)
 set.seed(123)</code></pre>
 </div>
-<div id="getting-exploring-cleaning-and-structuring-the-data" class="section level3">
-<h3>Getting, Exploring, Cleaning, and Structuring the Data</h3>
+</div>
+<div id="getting-exploring-cleaning-and-structuring-the-data" class="section level2">
+<h2>Getting, Exploring, Cleaning, and Structuring the Data</h2>
 <p>Here we get the data from the sources, setting missing data along the way, and take a look at the structure.</p>
 <pre class="r"><code>trainingData &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;, na.strings=c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))
 testingData  &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;,  na.strings=c(&quot;NA&quot;, &quot;#DIV/0!&quot;, &quot;&quot;))</code></pre>
@@ -126,7 +127,7 @@ dim(trainingData)</code></pre>
 testingData &lt;- testingData[, isTestingData]
 dim(testingData)</code></pre>
 <pre><code>## [1]  20 153</code></pre>
-</div>
+<p>We can see that we eliminated 100 columns from the trainingData data set. The testingData data set appears to be clean.</p>
 </div>
 <div id="how-we-will-cross-validate" class="section level2">
 <h2>How We Will Cross-Validate</h2>
@@ -138,7 +139,7 @@ dim(trainingTrainingData)</code></pre>
 <pre><code>## [1] 13737    53</code></pre>
 <pre class="r"><code>dim(testingTrainingData)</code></pre>
 <pre><code>## [1] 5885   53</code></pre>
-<p>This gives us a set of training data for actual training purposes having 11776 observations, or about 60% of the total training data, in a traingTrainingData. We also have 7846 observations of training data, in testTrainingData, that we will use to trest our model before final application on the downloaded test data that is in testingData.</p>
+<p>This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in a traingTrainingData. We also have 5885 observations of training data, in testTrainingData, that we will use to trest our model before final application on the downloaded test data that is in testingData.</p>
 <p>Later, we will use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.</p>
 <p>Before we start on the model, let’s check on covariates between trainingTrainingData and testingTrainingData to see if we can further simplify our data by eliminating “zero covariates” that will not help us predict.</p>
 <pre class="r"><code>NetZeroCovariateColumns &lt;- nearZeroVar(trainingTrainingData)
@@ -250,6 +251,7 @@ setwd(workingDirectory)</code></pre>
 <h2>References</h2>
 <p><a href="http://groupware.les.inf.puc-rio.br/har#dataset">http://groupware.les.inf.puc-rio.br/har#dataset</a></p>
 <p>Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013. Read more: <a href="http://groupware.les.inf.puc-rio.br/har#dataset#ixzz3gwqpfrXI">http://groupware.les.inf.puc-rio.br/har#dataset#ixzz3gwqpfrXI</a></p>
+<p><a href="http://stackoverflow.com/questions/28997402/r-read-csv-from-url-error-in-knitr">http://stackoverflow.com/questions/28997402/r-read-csv-from-url-error-in-knitr</a> for code to enable direct read.csv of URL-sourced data from within Knitr execution.</p>
 </div>
 
 

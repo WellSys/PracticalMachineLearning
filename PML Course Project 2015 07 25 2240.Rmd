@@ -15,7 +15,7 @@ Specifically, the goal of this project is to determine, without reference to the
 
 The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv, and the data for testing the machine's knowledge comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.  These data are provided by http://groupware.les.inf.puc-rio.br/har.
 
-This document summarizes 1) how the machine knowlege ("the model") was built, 2) how we cross-validated it, 3) what the expected out-of-sample error is, and what choices are made. 
+This document summarizes 1) how we get the data and prepare it for the exercise, 2) how we will cross-validate the data, 3) how the machine knowlege ("the model") is built, 4) the validation of the model including its expected accuracy and expected out-of-sample error rate, 5) the application of the model to the final test data, and 6) the parsing of the results for submission to Coursera. 
 
 ### Housekeeping
 
@@ -54,7 +54,7 @@ read.csv = function(file, ...) {
 }
 ```
 
-### Getting, Exploring, Cleaning, and Structuring the Data
+## Getting, Exploring, Cleaning, and Structuring the Data
 
 Here we get the data from the sources, setting missing data along the way, and take a look at the structure.
 
@@ -87,6 +87,8 @@ testingData <- testingData[, isTestingData]
 dim(testingData)
 ```
 
+We can see that we eliminated 100 columns from the trainingData data set.  The testingData data set appears to be clean.
+
 ## How We Will Cross-Validate
 
 We break up the training data for cross-validation purposes -- We divide the training data 70% for buidling the model (training), and 30% for testing the model on the training data before applying the model to downloaded test data.  
@@ -99,7 +101,7 @@ dim(trainingTrainingData)
 dim(testingTrainingData)
 ```
 
-This gives us a set of training data for actual training purposes having 11776 observations, or about 60% of the total training data, in a traingTrainingData.  We also have 7846 observations of training data, in testTrainingData, that we will use to trest our model before final application on the downloaded test data that is in testingData.  
+This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in a traingTrainingData.  We also have 5885 observations of training data, in testTrainingData, that we will use to test our model before final application on the downloaded test data that is in testingData.  
 
 Later, we will use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.
 
@@ -181,4 +183,4 @@ http://groupware.les.inf.puc-rio.br/har#dataset
 Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13) . Stuttgart, Germany: ACM SIGCHI, 2013. 
 Read more: http://groupware.les.inf.puc-rio.br/har#dataset#ixzz3gwqpfrXI
 
-
+http://stackoverflow.com/questions/28997402/r-read-csv-from-url-error-in-knitr  for code to enable direct read.csv of URL-sourced data from within Knitr execution.
