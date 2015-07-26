@@ -11,9 +11,9 @@ In this class project for Practical Machine Learning with Jeff Leek, PhD, of Joh
 
 "Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes." "Six young [male] health participants [aged between 20 - 28 years]  were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E)." (See http://groupware.les.inf.puc-rio.br/har#dataset)
 
-Specifically, the goal of this project is to determine, without reference to the _classe_ variable in test data, whether the test participats performed the physical exercises correclty and, if they did not perform the exercises correctly, in what manner they performed them incorrectly.
+Specifically, the goal of this project is to determine, without reference to the _classe_ variable in test data, whether the test participants performed the physical exercises correclty and, if they did not perform the exercises correctly, in what manner they performed the exercises incorrectly.
 
-The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv, and the data for testing the machine's knowledge comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.  These data are provided by http://groupware.les.inf.puc-rio.br/har.
+The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and the Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv, and the data for testing the machine's knowledge comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.  These data are provided by http://groupware.les.inf.puc-rio.br/har.
 
 This document summarizes 1) how we get the data and prepare it for the exercise, 2) how we will cross-validate the data, 3) how the machine knowlege ("the model") is built, 4) the validation of the model including its expected accuracy and expected out-of-sample error rate, 5) the application of the model to the final test data, and 6) the parsing of the results for submission to Coursera. 
 
@@ -87,7 +87,17 @@ testingData <- testingData[, isTestingData]
 dim(testingData)
 ```
 
-We can see that we eliminated 100 columns from the trainingData data set.  The testingData data set appears to be clean.
+We can see that we eliminated 100 columns from the trainingData data set.  
+
+Before we start on the model, let's check on covariates in the trainingData to see if we can further simplify our data by eliminating net- or near- "zero covariates" that will not help us predict.
+
+```{r NetZeroCovariates, echo = TRUE, message=TRUE}
+NetZeroCovariateColumns <- nearZeroVar(trainingData)
+
+NetZeroCovariateColumns
+```
+
+We can see from the fact that NetZeroCovariateColumns is zero that our prior data cleaning eliminated net zero covariates and that we should have clean predictors. 
 
 ## How We Will Cross-Validate
 
@@ -101,24 +111,13 @@ dim(trainingTrainingData)
 dim(testingTrainingData)
 ```
 
-This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in the trainingTrainingData data set.  We also have 5885 observations of training data, in the testTrainingData data set, that we will use to test our model before final application on the downloaded test data that is in the testingData data set.  
+This gives us a set of training data for actual training purposes having 13737 observations, or about 70% of the total training data, in the trainingTrainingData data set.  We also have 5885 observations of training data, in the testTrainingData data set, that we will use to test our model before using the model on the downloaded test data that is in the testingData data set.  
 
-Later, we will use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.
-
-Before we start on the model, let's check on covariates between trainingTrainingData and testingTrainingData to see if we can further simplify our data by eliminating "zero covariates" that will not help us predict.
-
-```{r NetZeroCovariates, echo = TRUE, message=TRUE}
-NetZeroCovariateColumns <- nearZeroVar(trainingTrainingData)
-
-NetZeroCovariateColumns
-```
-
-We can see from the fact that NetZeroCovariateColumns is zero that our prior data cleaning eliminated net zero covariates and that we should have clean predictors. 
+Later, we will also use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.
 
 ## How the Machine Knowlege ("The Model") is Built
 
-We will first build the model on the training portion of the training data using the randomForest alghorith.
-
+As a randomly chosen starting point, we will first build the model on the training portion of the training data, the trainingTrainingData data set, using the randomForest alghorith with K-fold cross validation across five subsets of data, and see what kind of accuracy we get.
 
 ```{r BuildModel, echo = TRUE, message=TRUE}
 trainingControl <- trainControl(method = "cv", 5)
@@ -131,6 +130,8 @@ modelFit <- train(classe ~ .,
 modelFit
 ```
 
+This looks promising, as the accuracy of the final model, mtry = 27, is 99.04%.
+
 ## Model Evaluation and Predicting Out-of-Sample Error Rate
 
 We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy and out-of-sample error rate.
@@ -141,9 +142,7 @@ testingTrainingDataPredictions <- predict(modelFit, testingTrainingData)
 confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)
 ```
 
-The matrix predicts that the accuracy of the model will be 99.17%.
-
-The matrix predicts that the out-of-sample error rate will be .83%.
+Our test against the testingTrainingData predicts that the accuracy of the model will be 99.17%, with an out-of-sample error rate of .83%.
 
 ## Model Application to Test Data
 
@@ -175,6 +174,8 @@ pml_write_files(results)
 
 setwd(workingDirectory)
 ```
+
+Our results turn out to be 100% accurate according to the Coursera results scoring page.
 
 ## References
 
