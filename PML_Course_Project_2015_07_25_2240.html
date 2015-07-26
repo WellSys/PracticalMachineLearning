@@ -87,9 +87,7 @@ library(randomForest)
 library(rpart.plot)
 library(ggplot2)
 library(lattice)
-set.seed(123)
-getwd()</code></pre>
-<pre><code>## [1] &quot;C:/Users/Doug/Documents/GitHub/PracticalMachineLearning&quot;</code></pre>
+set.seed(123)</code></pre>
 </div>
 <div id="getting-exploring-cleaning-and-structuring-the-data" class="section level3">
 <h3>Getting, Exploring, Cleaning, and Structuring the Data</h3>
@@ -130,10 +128,10 @@ testingData  &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmach
 <pre class="r"><code>table(testingData$classe)</code></pre>
 <pre><code>## &lt; table of extent 0 &gt;</code></pre>
 <p>We double-check for missing data . . .</p>
-<pre class="r"><code>ncol(trainingData[, colSums(is.na(trainingData))&gt;0])</code></pre>
-<pre><code>## [1] 100</code></pre>
-<pre class="r"><code>ncol(testingData[, colSums(is.na(testingData))&gt;0])</code></pre>
-<pre><code>## [1] 100</code></pre>
+<pre class="r"><code>ncol(trainingData[, colSums(is.na(trainingData))&gt;19621])</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code>ncol(testingData[, colSums(is.na(testingData))&gt;19621])</code></pre>
+<pre><code>## [1] 0</code></pre>
 <p>Looks like our missing data checks at download took care of this.</p>
 <p>Some basic cleanup – Based on our exploratory analysis, we will remove columns one through seven due to lack of relevance, and then remove columns that are NA.</p>
 <pre class="r"><code>trainingData &lt;- trainingData[,8:160]
@@ -163,19 +161,11 @@ dim(trainingTrainingData)</code></pre>
 
 NetZeroCovariateColumns</code></pre>
 <pre><code>## integer(0)</code></pre>
-<pre class="r"><code>if(length(NetZeroCovariateColumns) &gt; 0) {
-  trainingTrainingData &lt;- trainingTrainingData[, -NetZeroCovariateColumns]
-  testingTrainingData  &lt;- testingTrainingData[, -NetZeroCovariateColumns]
-}
-dim(trainingTrainingData)</code></pre>
-<pre><code>## [1] 13737    53</code></pre>
-<pre class="r"><code>dim(testingTrainingData)</code></pre>
-<pre><code>## [1] 5885   53</code></pre>
-<p>We can see from the facts 1) that NetZeroCovariateColumns is zero and 2) that the dimensions of the data sets did not change that our prior data cleaning eliminated net zero covariates and that we should have clean predictors.</p>
+<p>We can see from the fact that NetZeroCovariateColumns is zero that our prior data cleaning eliminated net zero covariates and that we should have clean predictors.</p>
 </div>
 <div id="how-the-machine-knowlege-the-model-is-built" class="section level2">
 <h2>How the Machine Knowlege (“The Model”) is Built</h2>
-<p>We first build the model on the training portion of the training data using the randomForest alghorith, and plot the top 15 predictors.</p>
+<p>We will first build the model on the training portion of the training data using the randomForest alghorith and evaluate its accuracy and out-of-sample error.</p>
 <pre class="r"><code>trainingControl &lt;- trainControl(method = &quot;cv&quot;, 5)
 
 modelFit &lt;- train(classe ~ ., 
@@ -205,8 +195,8 @@ modelFit</code></pre>
 ## Accuracy was used to select the optimal model using  the largest value.
 ## The final value used for the model was mtry = 27.</code></pre>
 </div>
-<div id="model-evaluation" class="section level2">
-<h2>Model Evaluation</h2>
+<div id="model-evaluation-and-predicting-out-of-sample-error-rate" class="section level2">
+<h2>Model Evaluation and Predicting Out-of-Sample Error Rate</h2>
 <p>We evaluate the model against the testingTrainingData data set first, producing a confusion matrix.</p>
 <pre class="r"><code>testingTrainingDataPredictions &lt;- predict(modelFit, testingTrainingData)
 
@@ -242,8 +232,8 @@ confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)</cod
 ## Detection Rate         0.2839   0.1915   0.1723   0.1606   0.1833
 ## Detection Prevalence   0.2845   0.1935   0.1743   0.1638   0.1839
 ## Balanced Accuracy      0.9973   0.9935   0.9872   0.9960   0.9992</code></pre>
-<p>The matrix indicates that the accuracy of the model is 99.17%.</p>
-<p>The out-of-sample error is the accuracy rate minus the no-information rate, or 70.64%.</p>
+<p>The matrix predicts that the accuracy of the model will be 99.17%.</p>
+<p>The matrix predicts that the out-of-sample error rate will be .83%.</p>
 </div>
 <div id="model-application-to-test-data" class="section level2">
 <h2>Model Application to Test Data</h2>
@@ -253,6 +243,24 @@ confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)</cod
 results</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
 ## Levels: A B C D E</code></pre>
+</div>
+<div id="uploading-results-to-coursera" class="section level2">
+<h2>Uploading Results to Coursera</h2>
+<pre class="r"><code>workingDirectory &lt;- getwd()
+
+setwd(&quot;F:/Prebuild Keep/Training/Coursera/8. Practical Machine Learning/CourseraSubmissionFiles&quot;)
+
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0(&quot;problem_id_&quot;,i,&quot;.txt&quot;)
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(results)
+
+setwd(workingDirectory)</code></pre>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>

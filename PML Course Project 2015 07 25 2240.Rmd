@@ -15,7 +15,7 @@ summary(cars)
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, }
 plot(cars)
 ```
 
@@ -45,7 +45,6 @@ library(rpart.plot)
 library(ggplot2)
 library(lattice)
 set.seed(123)
-getwd()
 ```
 
 ```{r EnableReadCSVURL, echo=FALSE, warning=FALSE, message=FALSE}
@@ -92,8 +91,8 @@ table(testingData$classe)
 We double-check for missing data . . .
 
 ```{r CheckColumnsOfMissingData, echo=TRUE}
-ncol(trainingData[, colSums(is.na(trainingData))>0])
-ncol(testingData[, colSums(is.na(testingData))>0])
+ncol(trainingData[, colSums(is.na(trainingData))>19621])
+ncol(testingData[, colSums(is.na(testingData))>19621])
 ```
 
 Looks like our missing data checks at download took care of this.
@@ -131,20 +130,14 @@ Before we start on the model, let's check on covariates between trainingTraining
 NetZeroCovariateColumns <- nearZeroVar(trainingTrainingData)
 
 NetZeroCovariateColumns
-
-if(length(NetZeroCovariateColumns) > 0) {
-  trainingTrainingData <- trainingTrainingData[, -NetZeroCovariateColumns]
-  testingTrainingData  <- testingTrainingData[, -NetZeroCovariateColumns]
-}
-dim(trainingTrainingData)
-dim(testingTrainingData)
 ```
 
-We can see from the facts 1) that NetZeroCovariateColumns is zero and 2) that the dimensions of the data sets did not change that our prior data cleaning eliminated net zero covariates and that we should have clean predictors. 
+We can see from the fact that NetZeroCovariateColumns is zero that our prior data cleaning eliminated net zero covariates and that we should have clean predictors. 
 
 ## How the Machine Knowlege ("The Model") is Built
 
-We first build the model on the training portion of the training data using the randomForest alghorith, and plot the top 15 predictors.
+We will first build the model on the training portion of the training data using the randomForest alghorith and evaluate its accuracy and out-of-sample error.
+
 
 ```{r BuildModel, echo = TRUE}
 trainingControl <- trainControl(method = "cv", 5)
@@ -157,7 +150,7 @@ modelFit <- train(classe ~ .,
 modelFit
 ```
 
-## Model Evaluation
+## Model Evaluation and Predicting Out-of-Sample Error Rate
 
 We evaluate the model against the testingTrainingData data set first, producing a confusion matrix.
 
@@ -167,9 +160,9 @@ testingTrainingDataPredictions <- predict(modelFit, testingTrainingData)
 confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)
 ```
 
-The matrix indicates that the accuracy of the model is 99.17%.
+The matrix predicts that the accuracy of the model will be 99.17%.
 
-The out-of-sample error is the accuracy rate minus the no-information rate, or 70.64%.
+The matrix predicts that the out-of-sample error rate will be .83%.
 
 ## Model Application to Test Data
 
@@ -182,26 +175,25 @@ results <- predict(modelFit, testingData)
 results
 ```
 
+## Uploading Results to Coursera
 
+```{r UploadToCoursera, echo = TRUE}
+workingDirectory <- getwd()
 
+setwd("F:/Prebuild Keep/Training/Coursera/8. Practical Machine Learning/CourseraSubmissionFiles")
 
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
 
+pml_write_files(results)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+setwd(workingDirectory)
+```
 
 ## References
 
