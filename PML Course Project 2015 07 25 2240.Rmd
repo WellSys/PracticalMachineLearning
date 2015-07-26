@@ -1,25 +1,9 @@
 ---
-title: "Practical Machine Learning Course Project Test"
+title: "Practical Machine Learning Course Project"
 author: "Doug McCaleb"
 date: "Saturday, July 25, 2015"
 output: html_document
 ---
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r}
-summary(cars)
-```
-
-You can also embed plots, for example:
-
-```{r, echo=FALSE, }
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ## Executive Summary
 
@@ -74,45 +58,40 @@ read.csv = function(file, ...) {
 
 Here we get the data from the sources, setting missing data along the way, and take a look at the structure.
 
-```{r DownloadAndRead, echo=TRUE}
+```{r DownloadAndRead, echo=TRUE, message=TRUE}
 trainingData <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", na.strings=c("NA", "#DIV/0!", ""))
 testingData  <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv",  na.strings=c("NA", "#DIV/0!", ""))
 ```
 
 Let's take a look at the data . . .
 
-```{r Structure, echo = TRUE}
+```{r Structure, echo = TRUE, message=TRUE}
 str(trainingData, list.len = 10)
 str(testingData, list.len = 10)
 table(trainingData$classe)
 table(testingData$classe)
 ```
 
-We double-check for missing data . . .
-
-```{r CheckColumnsOfMissingData, echo=TRUE}
-ncol(trainingData[, colSums(is.na(trainingData))>19621])
-ncol(testingData[, colSums(is.na(testingData))>19621])
-```
-
-Looks like our missing data checks at download took care of this.
-
 Some basic cleanup -- Based on our exploratory analysis, we will remove columns one through seven due to lack of relevance, and then remove columns that are NA.
 
-```{r RemoveColumns,echo=TRUE}
+```{r RemoveColumns,echo=TRUE, message=TRUE}
 trainingData <- trainingData[,8:160]
 testingData  <- testingData[,8:160]
-trainingData <- trainingData[, colSums(is.na(trainingData))==0]
-testingData  <- testingData[, colSums(is.na(testingData))==0]
-nrow(trainingData[, colSums(is.na(trainingData))>0])
-nrow(testingData[, colSums(is.na(testingData))>0])
+
+isTrainingData  <- apply(!is.na(trainingData), 2, sum) > 19621  
+trainingData <- trainingData[, isTrainingData]
+dim(trainingData)
+
+isTestingData  <- apply(!is.na(trainingData), 2, sum) > 19  
+testingData <- testingData[, isTestingData]
+dim(testingData)
 ```
 
 ## How We Will Cross-Validate
 
 We break up the training data for cross-validation purposes -- We divide the training data 70% for buidling the model (training), and 30% for testing the model on the training data before applying the model to downloaded test data.  
 
-```{r SplitTrainingData, echo = TRUE}
+```{r SplitTrainingData, echo = TRUE, message=TRUE}
 dataForTraining <- createDataPartition(y = trainingData$classe, p = 0.7, list = FALSE)
 trainingTrainingData <- trainingData[dataForTraining,]
 testingTrainingData  <- trainingData[-dataForTraining,]
@@ -126,7 +105,7 @@ Later, we will use K-fold cross-validation in the random forest alghorithm from 
 
 Before we start on the model, let's check on covariates between trainingTrainingData and testingTrainingData to see if we can further simplify our data by eliminating "zero covariates" that will not help us predict.
 
-```{r NetZeroCovariates, echo = TRUE}
+```{r NetZeroCovariates, echo = TRUE, message=TRUE}
 NetZeroCovariateColumns <- nearZeroVar(trainingTrainingData)
 
 NetZeroCovariateColumns
@@ -139,7 +118,7 @@ We can see from the fact that NetZeroCovariateColumns is zero that our prior dat
 We will first build the model on the training portion of the training data using the randomForest alghorith and evaluate its accuracy and out-of-sample error.
 
 
-```{r BuildModel, echo = TRUE}
+```{r BuildModel, echo = TRUE, message=TRUE}
 trainingControl <- trainControl(method = "cv", 5)
 
 modelFit <- train(classe ~ ., 
@@ -154,7 +133,7 @@ modelFit
 
 We evaluate the model against the testingTrainingData data set first, producing a confusion matrix.
 
-```{r EvaluateModel, echo = TRUE}
+```{r EvaluateModel, echo = TRUE, message=TRUE}
 testingTrainingDataPredictions <- predict(modelFit, testingTrainingData)
 
 confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)
@@ -168,7 +147,7 @@ The matrix predicts that the out-of-sample error rate will be .83%.
 
 Now we apply our model to the downloaded test data in the testingData data set.
 
-```{r Results, echo = TRUE}
+```{r Results, echo = TRUE, message=TRUE}
 
 results <- predict(modelFit, testingData)
 
@@ -177,7 +156,7 @@ results
 
 ## Uploading Results to Coursera
 
-```{r UploadToCoursera, echo = TRUE}
+```{r UploadToCoursera, echo = TRUE, message=TRUE}
 workingDirectory <- getwd()
 
 setwd("F:/Prebuild Keep/Training/Coursera/8. Practical Machine Learning/CourseraSubmissionFiles")
