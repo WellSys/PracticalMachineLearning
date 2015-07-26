@@ -15,7 +15,7 @@ Specifically, the goal of this project is to determine, without reference to the
 
 The data are taken from personal fitness devices such as the FitBit, the Nike FuelBand, and the Jawbone Up, all of which are able to produce signficant amounts of data. The data we will use for machine training comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv, and the data for testing the machine's knowledge comes from https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.  These data are provided by http://groupware.les.inf.puc-rio.br/har.
 
-This document summarizes 1) how we get the data and prepare it for the exercise, 2) how we will cross-validate the data, 3) how the machine knowlege ("the model") is built, 4) the validation of the model including its expected accuracy and expected out-of-sample error rate, 5) the application of the model to the final test data, and 6) the parsing of the results for submission to Coursera. 
+This document summarizes 1) how we get the data and prepare it for the exercise, 2) how we will cross-validate the data, 3) how we build the model and predict the out-of-sample error rate, 4) the validation of the model including its expected accuracy, 5) the application of the model to the final test data, and 6) the parsing of the results for submission to Coursera. 
 
 ### Housekeeping
 
@@ -115,9 +115,9 @@ This gives us a set of training data for actual training purposes having 13737 o
 
 Later, we will also use K-fold cross-validation in the random forest alghorithm from the caret package to infer our model in the trainingTrainingData data set.
 
-### How the Machine Knowlege ("The Model") is Built
+### Building the Model and Predicting Out-of-Sample Error
 
-As a randomly chosen starting point, we will first build the model on the training portion of the training data, the trainingTrainingData data set, using the randomForest alghorith with K-fold cross validation across five subsets of data, and see what kind of accuracy we get.
+Due to its ability to handle large numbers of variables with unknown interactions, and its in-built cross-validation capability, we will first build the model on the training portion of the training data, the trainingTrainingData data set, using the randomForest alghorith with K-fold cross validation across five subsets of data, and see what kind of accuracy we get.
 
 ```{r BuildModel, echo = TRUE, message=TRUE}
 trainingControl <- trainControl(method = "cv", 5)
@@ -128,21 +128,33 @@ modelFit <- train(classe ~ .,
                   trControl = trainingControl, 
                   ntree = 501)
 modelFit
+
+modelFit$finalModel
 ```
 
-This looks promising, as the accuracy of the final model, mtry = 27, is 99.04%.
+This looks promising, as the accuracy of the final model, mtry = 27, is 99.04%, and the out-of-sample (Out-of-Bag or OOB) error rate is predicted to be .66%
 
 ### Model Evaluation and Predicting Out-of-Sample Error Rate
 
-We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy and out-of-sample error rate.
+We evaluate the model against the testingTrainingData data set first, producing a confusion matrix, and predicting its accuracy.
 
 ```{r EvaluateModel, echo = TRUE, message=TRUE}
 testingTrainingDataPredictions <- predict(modelFit, testingTrainingData)
 
+manualAccuracy <- sum(testingTrainingDataPredictions == testingTrainingData$classe)/length(testingTrainingDataPredictions)
+
+manualAccuracy
+
+manualOutOfSampleError <- 1 - manualAccuracy
+
+manualOutOfSampleError
+
 confusionMatrix(testingTrainingData$classe, testingTrainingDataPredictions)
 ```
 
-Our test against the testingTrainingData predicts that the accuracy of the model will be 99.17%, with an out-of-sample error rate of .83%.
+Our test against the testingTrainingData predicts that the accuracy of the model will be 99.17%, with an out-of-sample error rate of .83%, calculated manually and using confusionMatrix.
+
+We will use this for our first results submission. 
 
 ### Model Application to Test Data
 
@@ -175,7 +187,7 @@ pml_write_files(results)
 setwd(workingDirectory)
 ```
 
-Our results turn out to be 100% accurate according to the Coursera results scoring page.
+Our results turn out to be 100% accurate according to the Coursera results scoring page.  In this instance, use of random forest was a wise choice. 
 
 ### References
 
